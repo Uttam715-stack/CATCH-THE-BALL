@@ -1,0 +1,65 @@
+#include <stdio.h>
+#include<stdlib.h>
+#include <conio.h>      // kbhit, getch (Windows / some DOS compilers)
+#include <windows.h>    // Sleep, system("cls")
+#define WIDTH 40
+#define HEIGHT 20
+int main() {
+    int ballX = WIDTH / 2;
+    int ballY = 0;
+    int basketX = WIDTH / 2;   // basket position (center)
+    int score = 0;
+    int lives = 3;
+    int ch;
+ while (lives > 0) {
+        // input (non‑blocking)
+        if (_kbhit()) {
+            ch = _getch();
+            if (ch == 'a' || ch == 'A') {
+                if (basketX > 1) basketX--;
+            } else if (ch == 'd' || ch == 'D') {
+                if (basketX < WIDTH - 2) basketX++;
+            } else if (ch == 'q' || ch == 'Q') {
+                break;  // quit
+            }
+        }
+  // update ball
+        ballY++;
+  // check if ball reached bottom
+        if (ballY == HEIGHT - 1) {
+            // check if caught (basket width = 5: basketX-2 .. basketX+2)
+            if (ballX >= basketX - 2 && ballX <= basketX + 2) {
+                score++;
+            } else {
+                lives--;
+            }
+            // reset ball at random x
+            ballY = 0;
+            ballX = 1 + rand() % (WIDTH - 2);
+        }
+ // draw frame
+        system("cls");
+  // top border
+        for (int x = 0; x < WIDTH; x++) printf("-");
+        printf("\n");
+  for (int y = 0; y < HEIGHT; y++) {
+            for (int x = 0; x < WIDTH; x++) {
+                if (y == ballY && x == ballX) {
+                    printf("O");            // ball
+                } else if (y == HEIGHT - 1 &&
+                           x >= basketX - 2 && x <= basketX + 2) {
+                    printf("=");            // basket
+                } else if (x == 0 || x == WIDTH - 1) {
+                    printf("|");            // side walls
+                } else {
+                    printf(" ");
+                }
+            }
+            printf("\n");
+        }
+ printf("Score: %d   Lives: %d   (A=left, D=right, Q=quit)\n", score, lives);
+ Sleep(100);  // control speed (ms)
+    } system("cls");
+    printf("Game Over!\nFinal score: %d\n", score);
+    return 0;
+}
